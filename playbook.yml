@@ -1,6 +1,6 @@
 ---
 - name: mlag on sw3 and sw4
-  hosts: mlag_switches
+  hosts: mlag_switches # runs basically the following tasks on the defined switches in hosts
   gather_facts: false
   roles:
     - peer_setup

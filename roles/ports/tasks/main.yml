@@ -7,7 +7,7 @@
       - switchport mode trunk
       - switchport trunk native vlan 1
       - "switchport trunk allowed vlan {{ allowed_vlans }}"
-      - "mlag {{ item.mlag_id }}"
+      - "mlag {{ item.mlag_id }}" 
     parents: "interface Port-Channel{{ item.port_channel }}"
   loop: "{{ mlag_ports }}"
 
@@ -19,7 +19,7 @@
     parents: "interface {{ item.interface }}"
   loop: "{{ mlag_ports }}"
 
-- name: fast lacp timer on host ports # This increases the time to say the link is down
+- name: fast lacp timer on host ports # This decreases the time to say the link is down
   arista.eos.eos_config:
     lines:
       - lacp timer fast

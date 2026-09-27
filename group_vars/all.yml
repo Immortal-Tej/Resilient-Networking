@@ -12,5 +12,4 @@ data_vlans:
   - { id: 20, name: vlan20 }
   - { id: 30, name: vlan30 }
 
-# vlan 1 has to stay in here, host1's bond0 sends untagged traffic
-allowed_vlans: "1,10,20,30"
+allowed_vlans: "1,10,20,30" # as per assignment, 1 is for untagged traffic

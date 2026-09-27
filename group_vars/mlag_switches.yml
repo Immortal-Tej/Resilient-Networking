@@ -10,7 +10,7 @@ mlag_ports:
   - desc: host1
     interface: Ethernet4
     port_channel: 4 # actual port number 
-    mlag_id: 4 #mlag_id must always match with port number
+    mlag_id: 4 # macting iwth po for convinience
     lacp_timer_fast: true  # this is added since the recovery took ~ >20secs, something to do with LACPDU msgs
   - desc: uplink to sw1
     interface: Ethernet1
