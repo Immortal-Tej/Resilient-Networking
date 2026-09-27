@@ -1,0 +1,16 @@
+ansible_connection: ansible.netcommon.httpapi
+ansible_network_os: arista.eos.eos
+ansible_user: admin
+ansible_password: admin
+ansible_httpapi_use_ssl: true
+ansible_httpapi_validate_certs: false
+ansible_become: true
+ansible_become_method: enable
+
+data_vlans:
+  - { id: 10, name: vlan10 }
+  - { id: 20, name: vlan20 }
+  - { id: 30, name: vlan30 }
+
+# vlan 1 has to stay in here, host1's bond0 sends untagged traffic
+allowed_vlans: "1,10,20,30"

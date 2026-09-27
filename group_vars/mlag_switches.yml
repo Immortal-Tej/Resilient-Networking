@@ -1,0 +1,19 @@
+mlag_domain_id: sw3sw4
+mlag_peer_vlan: 99
+mlag_peer_link_port_channel: 1000 # should never clash with host port channel nums
+mlag_peer_link_interface: Ethernet2
+
+mlag_reload_delay_mlag: 60
+mlag_reload_delay_non_mlag: 70
+
+mlag_ports:
+  - desc: host1
+    interface: Ethernet4
+    port_channel: 4 # actual port number 
+    mlag_id: 4 #mlag_id must always match with port number
+    lacp_timer_fast: true  # this is added since the recovery took ~ >20secs, something to do with LACPDU msgs
+  - desc: uplink to sw1
+    interface: Ethernet1
+    port_channel: 100 # It shouldn't clash with Host port numbers
+    mlag_id: 100
+    lacp_timer_fast: false

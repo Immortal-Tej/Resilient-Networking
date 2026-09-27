@@ -1,0 +1,32 @@
+---
+# This is how Arista wants, also if we add another cable, the same port channel can be used
+- name: port channel as mlag trunk
+  arista.eos.eos_config:
+    lines:
+      - "description {{ item.desc }}"
+      - switchport mode trunk
+      - switchport trunk native vlan 1
+      - "switchport trunk allowed vlan {{ allowed_vlans }}"
+      - "mlag {{ item.mlag_id }}"
+    parents: "interface Port-Channel{{ item.port_channel }}"
+  loop: "{{ mlag_ports }}"
+
+- name: put the physical port in the channel group
+  arista.eos.eos_config:
+    lines:
+      - "description {{ item.desc }}"
+      - "channel-group {{ item.port_channel }} mode active"
+    parents: "interface {{ item.interface }}"
+  loop: "{{ mlag_ports }}"
+
+- name: fast lacp timer on host ports # This increases the time to say the link is down
+  arista.eos.eos_config:
+    lines:
+      - lacp timer fast
+    parents: "interface {{ item.interface }}" # Port Eth4 on both switches only
+  loop: "{{ mlag_ports }}"
+  when: item.lacp_timer_fast # only if in the var says true
+
+- name: save
+  arista.eos.eos_config:
+    save_when: modified

@@ -1,0 +1,13 @@
+---
+- name: mlag on sw3 and sw4
+  hosts: mlag_switches
+  gather_facts: false
+  roles:
+    - peer_setup
+    - ports
+
+- name: sw1 uplink bundle
+  hosts: sw1_group
+  gather_facts: false
+  roles:
+    - sw1_uplink

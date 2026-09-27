@@ -1,0 +1,34 @@
+---
+- name: create vlans on sw1 too
+  arista.eos.eos_config:
+    lines:
+      - "name {{ item.name }}"
+    parents: "vlan {{ item.id }}"
+  loop: "{{ data_vlans }}"
+
+- name: link to sw3 into the channel group
+  arista.eos.eos_config:
+    lines:
+      - description link to sw3
+      - "channel-group {{ sw1_port_channel }} mode active"
+    parents: "interface {{ sw1_interface_to_sw3 }}"
+
+- name: link to sw4 into the channel group
+  arista.eos.eos_config:
+    lines:
+      - description link to sw4
+      - "channel-group {{ sw1_port_channel }} mode active"
+    parents: "interface {{ sw1_interface_to_sw4 }}"
+
+- name: port channel to sw3/sw4 as trunk
+  arista.eos.eos_config:
+    lines:
+      - description uplink to sw3 sw4
+      - switchport mode trunk
+      - switchport trunk native vlan 1
+      - "switchport trunk allowed vlan {{ allowed_vlans }}"
+    parents: "interface Port-Channel{{ sw1_port_channel }}"
+
+- name: save
+  arista.eos.eos_config:
+    save_when: modified

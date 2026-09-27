@@ -1,0 +1,56 @@
+---
+- name: create vlans
+  arista.eos.eos_config:
+    lines:
+      - "name {{ item.name }}"
+    parents: "vlan {{ item.id }}"
+  loop: "{{ data_vlans }}"
+
+- name: create peer vlan for mlag
+  arista.eos.eos_config:
+    lines:
+      - name peer
+      - trunk group peergrp
+    parents: "vlan {{ mlag_peer_vlan }}"
+
+- name: no stp on peer vlan
+  arista.eos.eos_config:
+    lines:
+      - "no spanning-tree vlan-id {{ mlag_peer_vlan }}"
+
+- name: peer link physical port
+  arista.eos.eos_config:
+    lines:
+      - description peerlink
+      - "channel-group {{ mlag_peer_link_port_channel }} mode active"
+    parents: "interface {{ mlag_peer_link_interface }}"
+
+- name: peer link port channel
+  arista.eos.eos_config:
+    lines:
+      - description peerlink
+      - switchport mode trunk
+      - switchport trunk group peergrp
+    parents: "interface Port-Channel{{ mlag_peer_link_port_channel }}"
+
+- name: ip on the peer vlan for mlag control traffic
+  arista.eos.eos_config:
+    lines:
+      - "ip address {{ mlag_local_ip }}/30" # /30 subnet gives us 4 IP address, but 2 are unusable - .0(Network) .3(Brodcast)
+      - no autostate # should reduce the delay, if a switch comes back, without- vlan99 should comeback up only if port is active 
+    parents: "interface Vlan{{ mlag_peer_vlan }}"
+
+- name: the actual mlag config
+  arista.eos.eos_config:
+    lines:
+      - "domain-id {{ mlag_domain_id }}"
+      - "local-interface Vlan{{ mlag_peer_vlan }}"
+      - "peer-address {{ mlag_peer_ip }}"
+      - "peer-link Port-Channel{{ mlag_peer_link_port_channel }}"
+      - "reload-delay mlag {{ mlag_reload_delay_mlag }}"
+      - "reload-delay non-mlag {{ mlag_reload_delay_non_mlag }}"
+    parents: mlag configuration
+
+- name: save
+  arista.eos.eos_config:
+    save_when: modified #Just a write command to permanantly save the config
